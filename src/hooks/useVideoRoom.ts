@@ -16,8 +16,8 @@ export const useVideoRoom = (url: string, token: string) => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [localAudioEnabled, setLocalAudioEnabled] = useState(true);
-  const [localVideoEnabled, setLocalVideoEnabled] = useState(true);
+  const [localAudioEnabled, setLocalAudioEnabled] = useState(false); // mic off initially
+  const [localVideoEnabled, setLocalVideoEnabled] = useState(false); // video off initially
   const [isScreenSharing, setIsScreenSharing] = useState(false);
 
   const connectToRoom = useCallback(async () => {
