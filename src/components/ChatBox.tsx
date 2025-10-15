@@ -29,7 +29,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ userName, messages, onSend, on
   };
 
   return (
-    <div className="fixed top-0 right-0 h-full w-80 bg-gray-900 border-l border-gray-800 flex flex-col z-50 shadow-lg">
+    <div className="fixed top-0 right-0 bottom-24 w-80 bg-gray-900 border-l border-gray-800 flex flex-col z-50 shadow-lg">
       <div className="flex items-center justify-between p-4 border-b border-gray-800 bg-gray-950">
         <span className="text-white font-semibold">Chat</span>
         <button onClick={onClose} className="text-gray-400 hover:text-white">✕</button>

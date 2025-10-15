@@ -1,7 +1,9 @@
+import { useEffect, useState } from 'react';
 import { useVideoRoom } from '../hooks/useVideoRoom';
 import { VideoGrid } from './VideoGrid';
 import { ControlBar } from './ControlBar';
 import { Loader2 } from 'lucide-react';
+import { ChatBox } from './ChatBox';
 
 interface VideoConferenceProps {
   url: string;
@@ -9,6 +11,8 @@ interface VideoConferenceProps {
 }
 
 export const VideoConference = ({ url, token }: VideoConferenceProps) => {
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<{ user: string; text: string }[]>([]);
   const {
     room,
     participants,
@@ -24,6 +28,30 @@ export const VideoConference = ({ url, token }: VideoConferenceProps) => {
     toggleVideo,
     toggleScreenShare,
   } = useVideoRoom(url, token);
+
+  useEffect(() => {
+    if (!room) return;
+    const handleData = (payload: Uint8Array, participant?: any) => {
+      try {
+        const text = new TextDecoder().decode(payload);
+        const user = participant?.name || participant?.identity || 'Participant';
+        setChatMessages((prev) => [...prev, { user, text }]);
+      } catch {}
+    };
+    // LiveKit emits 'dataReceived' on Room
+    (room as any).on('dataReceived', handleData);
+    return () => {
+      (room as any).off('dataReceived', handleData);
+    };
+  }, [room]);
+
+  const handleSendChat = (text: string) => {
+    if (!room || !text.trim()) return;
+    const data = new TextEncoder().encode(text);
+    room.localParticipant.publishData(data, { reliable: true });
+    const me = room.localParticipant;
+    setChatMessages((prev) => [...prev, { user: me.name || me.identity, text }]);
+  };
 
   if (!isConnected && !isConnecting && !error) {
     return (
@@ -144,8 +172,17 @@ export const VideoConference = ({ url, token }: VideoConferenceProps) => {
         onToggleAudio={toggleAudio}
         onToggleVideo={toggleVideo}
         onToggleScreenShare={toggleScreenShare}
+        onToggleChat={() => setIsChatOpen((v) => !v)}
         onLeaveCall={disconnectFromRoom}
       />
+      {isChatOpen && (
+        <ChatBox
+          userName={room?.localParticipant?.name || room?.localParticipant?.identity || 'You'}
+          messages={chatMessages}
+          onSend={handleSendChat}
+          onClose={() => setIsChatOpen(false)}
+        />
+      )}
     </div>
   );
 };

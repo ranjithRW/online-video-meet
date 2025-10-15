@@ -12,7 +12,7 @@ import {
   MoreVertical,
   Maximize,
 } from 'lucide-react';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface ControlBarProps {
   isAudioEnabled: boolean;
@@ -22,6 +22,7 @@ interface ControlBarProps {
   onToggleAudio: () => void;
   onToggleVideo: () => void;
   onToggleScreenShare: () => void;
+  onToggleChat: () => void;
   onLeaveCall: () => void;
 }
 
@@ -33,6 +34,7 @@ export const ControlBar = ({
   onToggleAudio,
   onToggleVideo,
   onToggleScreenShare,
+  onToggleChat,
   onLeaveCall,
 }: ControlBarProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -161,6 +163,7 @@ export const ControlBar = ({
             </button>
 
             <button
+              onClick={onToggleChat}
               className="group relative p-4 rounded-full bg-gray-700 hover:bg-gray-600 transition-all duration-200"
               title="Chat"
             >
