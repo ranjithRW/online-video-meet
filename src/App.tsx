@@ -15,9 +15,9 @@ function App() {
     setError('');
 
     try {
-      const livekitUrl = import.meta.env.VITE_LIVEKIT_URL;
-      const apiKey = import.meta.env.VITE_LIVEKIT_API_KEY;
-      const apiSecret = import.meta.env.VITE_LIVEKIT_API_SECRET;
+      const livekitUrl = "wss://voiceagent-2f25nmiw.livekit.cloud";
+      const apiKey = "APIRUkZimSeUKcV";
+      const apiSecret = "gkeERrqRE3rm4MHjqHdSXDjaJvy5sydDdAcUfqqMeNTB";
 
       if (!livekitUrl || !apiKey || !apiSecret) {
         setError('Missing LiveKit configuration');
@@ -92,7 +92,7 @@ function App() {
     return <JoinRoom onJoin={handleJoinRoom} />;
   }
 
-  const livekitUrl = import.meta.env.VITE_LIVEKIT_URL;
+  const livekitUrl = "wss://voiceagent-2f25nmiw.livekit.cloud";
 
   return <VideoConference url={livekitUrl} token={token} />;
 }
