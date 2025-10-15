@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Participant, Track } from 'livekit-client';
+import { Participant, Track, LocalParticipant } from 'livekit-client';
 import { Mic, MicOff, User } from 'lucide-react';
 
 interface ParticipantVideoProps {
@@ -72,6 +72,55 @@ export const ParticipantVideo = ({ participant, isLocal = false }: ParticipantVi
     participant.on('trackMuted', handleTrackMuted);
     participant.on('trackUnmuted', handleTrackUnmuted);
     participant.on('isSpeakingChanged', handleIsSpeakingChanged);
+
+    // Handle local participant publish/unpublish so local camera shows in tile
+    if (participant instanceof LocalParticipant) {
+      const handleLocalTrackPublished = (publication: any) => {
+        if (publication?.track && publication.kind === Track.Kind.Video && videoRef.current) {
+          publication.track.attach(videoRef.current);
+          setHasVideo(true);
+        }
+        if (publication?.kind === Track.Kind.Audio) {
+          setIsMuted(false);
+        }
+      };
+
+      const handleLocalTrackUnpublished = (publication: any) => {
+        if (publication?.track && publication.kind === Track.Kind.Video) {
+          publication.track.detach();
+          setHasVideo(false);
+        }
+        if (publication?.kind === Track.Kind.Audio) {
+          setIsMuted(true);
+        }
+      };
+
+      participant.on('localTrackPublished', handleLocalTrackPublished);
+      participant.on('localTrackUnpublished', handleLocalTrackUnpublished);
+
+      // Cleanup for local participant listeners
+      return () => {
+        participant.off('trackSubscribed', handleTrackSubscribed);
+        participant.off('trackUnsubscribed', handleTrackUnsubscribed);
+        participant.off('trackMuted', handleTrackMuted);
+        participant.off('trackUnmuted', handleTrackUnmuted);
+        participant.off('isSpeakingChanged', handleIsSpeakingChanged);
+        participant.off('localTrackPublished', handleLocalTrackPublished);
+        participant.off('localTrackUnpublished', handleLocalTrackUnpublished);
+
+        participant.videoTrackPublications.forEach((publication) => {
+          if (publication.track) {
+            publication.track.detach();
+          }
+        });
+
+        participant.audioTrackPublications.forEach((publication) => {
+          if (publication.track) {
+            publication.track.detach();
+          }
+        });
+      };
+    }
 
     return () => {
       participant.off('trackSubscribed', handleTrackSubscribed);
