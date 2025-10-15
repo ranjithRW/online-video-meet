@@ -18,6 +18,7 @@ function App() {
       const livekitUrl = "wss://voiceagent-2f25nmiw.livekit.cloud";
       const apiKey = "APIRUkZimSeUKcV";
       const apiSecret = "gkeERrqRE3rm4MHjqHdSXDjaJvy5sydDdAcUfqqMeNTB";
+      //import.meta.env.VITE_LIVEKIT_API_SECRET
 
       if (!livekitUrl || !apiKey || !apiSecret) {
         setError('Missing LiveKit configuration');
